@@ -16,11 +16,11 @@ pipelines (a radare2 agent, a Ghidra-style agent, an LLM package scanner, and
 strings and email triage) scored for misses, aborted analyses, wrong reports and
 agent hijacks; and (iii) defenses that quarantine artifact text, check verdict
 consistency across views and models, and treat text addressed to an AI as
-evidence of malice. On two 3B open models, published-style injections defeat
-33% (Qwen2.5-3B) and 57% (Llama-3.2-3B) of injected malware samples in
-undefended pipelines, including a radare2 agent on real ELF binaries. The
-quarantine pipeline reduces this to 0% and 5%, at the cost of more false
-positives for the better-calibrated model. Prompt-only defenses
+evidence of malice. On three small open models, published-style injections
+defeat 33% (Qwen2.5-3B), 57% (Llama-3.2-3B) and 60% (Gemma-2-2B) of injected
+malware samples in undefended pipelines, including a radare2 agent on real ELF
+binaries. The quarantine pipeline reduces this to 0%, 5% and 0%, at the cost of
+more false positives for the better-calibrated models. Prompt-only defenses
 (spotlighting, an "evidence" instruction) leave planted decoys in almost every
 report. On held-out real packages that ship LLM prompts, the evidence detector
 flags 4 of 25 packages (all false positives, none among non-LLM packages). A
@@ -144,17 +144,19 @@ consistent across models. All tables:
 
 | injected malware defeated (of 86) | Qwen2.5-3B | Llama-3.2-3B | Gemma-2-2B |
 |---|---|---|---|
-| no defense | 33% | 57% | _pending_ |
+| no defense | 33% | 57% | 60%² |
 | spotlighting (datamark + delimiters)¹ | 22% | - | - |
 | spotlighting + evidence prompt¹ | 17% | - | - |
-| detector escalation of the raw verdict | 12% | 22% | _pending_ |
-| quarantine pipeline | **0%** | **5%** | _pending_ |
-| clean malware detected (none → quarantine) | 100% → 100% | 83% → 100% | _pending_ |
-| benign flagged (none → quarantine) | 95% → 89% | 32% → 68% | _pending_ |
+| detector escalation of the raw verdict | 12% | 22% | 40% |
+| quarantine pipeline | **0%** | **5%** | **0%** |
+| induced failures, none → quarantine | 33% → 0% | 52% → 5% | 33% → 0% |
+| clean malware detected (none → quarantine) | 100% → 100% | 83% → 100% | 83% → 100% |
+| benign flagged (none → quarantine) | 95% → 89% | 32% → 68% | 53% → 68% |
 
 ¹ Run on the 72 core samples only (no ELF binaries). On the same 72 samples
 Qwen's undefended failure is 26%, detector escalation 11%, quarantine 0% and
-cross-model 24%.
+cross-model 24%. ² Includes 29 agent runs in which Gemma executed the allow-list
+tool, which it also does on clean malware (6/6); see below.
 
 *Prompt-only defenses.* Spotlighting barely moves the needle (26% → 22%), and
 harness mimicry got slightly *more* effective (5/8 → 6/8). Adding the evidence
@@ -163,14 +165,18 @@ framing helps more (17%): override and cover-story flips disappear (2/8 → 0/8,
 A model that is told the text is untrusted still copies "facts" out of it. Only
 removing the text from the view (quarantine) prevents that.
 
-*By strategy* (no defense, Qwen / Llama): harness mimicry 70% / 90%,
-cover story 60% / 70%, direct override 40% / 70%, misdirection 100% / 100%
-(decoy IOCs or attribution in the report), tool spoofing 10% / 30%,
-implicit cover story 0% / 38%, context flooding 0% / 75%, and fake system
-messages and refusal bait 0% / 20% each. The two techniques seen in the most
-prominent 2026 samples, Gaslight's fake errors and Hades' refusal bait, were the
-least effective against these models. Neither model ever refused or claimed an
-error, so the abort column is empty. This matches the public assessment that
+*By strategy* (no defense, Qwen / Llama / Gemma): harness mimicry
+70% / 90% / 90%, cover story 60% / 70% / 90%, direct override 40% / 70% / 60%,
+misdirection 100% / 100% / 80% (decoy IOCs or attribution in 10, 10 and 7 of
+10 reports), tool
+spoofing 10% / 30% / 50%, implicit cover story 0% / 38% / 25%, context flooding
+0% / 75% / 50%, fake system messages 0% / 20% / 40% and refusal bait
+0% / 20% / 50%. Gemma's agent-pipeline numbers are inflated by its
+injection-independent allow-listing (see below). The two techniques seen in the
+most prominent 2026 samples, Gaslight's fake errors and Hades' refusal bait, were
+the least effective against the two 3B models. No model ever refused or claimed
+an error, so the abort column is empty. Where they worked, they produced a
+"benign" verdict instead of an abort. This matches the public assessment that
 these attacks are unreliable. It may change with more safety-tuned models
 (Socket reports a frontier model halting on Hades), and our harness records
 aborts separately so the question can be re-run.
@@ -178,10 +184,17 @@ aborts separately so the question can be re-run.
 *By pipeline* (no defense → quarantine): strings triage 28% → 0% (Qwen),
 67% → 6% (Llama); Ghidra-style agent 17% → 0%, 94% → 17%; package scanner
 33% → 0%, 44% → 0%; email triage 28% → 0%, 28% → 0%; radare2 agent on compiled
-ELFs 64% → 0%, 50% → 0%. The agents were not hijacked in any undefended run
-(no executed `whitelist_sample` on injected malware), although Gemma called the
-tool spuriously during piloting. Under quarantine the tool is deferred and never
-executed on malware.
+ELFs 64% → 0%, 50% → 0%. Gemma: strings 39% → 0%, Ghidra-style agent 100% → 0%,
+packages 50% → 0%, email 28% → 0%, radare2 agent 93% → 0%.
+
+*Privileged tools.* Qwen and Llama never executed `whitelist_sample` on malware.
+Gemma-2-2B executed it in 35 of 38 undefended agent runs on malware: 6/6 clean
+samples, 26/28 injected and 3/4 tool-spoofing samples. It also executed it on 4/6
+benign ones. This is capability misuse by a weak model rather than an injection
+effect, and it is exactly what an injection would exploit. In the quarantine
+pipeline the tool is deferred until `submit_report` and executed only if the
+final verdict is benign and the detector found nothing. That blocked all 34
+malware cases, while still allow-listing 2 of the 6 benign samples.
 
 *Residual failures under quarantine* (Llama, 4/86) are three context-flooding
 samples and one implicit cover story: the two strategies that do not address the
@@ -193,8 +206,8 @@ output with copyright notice".
 hard negatives (LLM CLI, backup agent, red-team kit, model downloader). Qwen
 flags 89–95% of benign artifacts under every configuration. Small models are
 poorly calibrated triage engines. The relevant comparison is therefore *induced*
-failure (Table 4 in results), which tells the same story: 33% → 0% (Qwen) and
-52% → 5% (Llama).
+failure (Table 4 in results), which tells the same story: 33% → 0% (Qwen),
+52% → 5% (Llama) and 33% → 0% (Gemma).
 
 ### 6.0b Consistency checks
 

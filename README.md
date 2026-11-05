@@ -51,26 +51,39 @@ abort, a wrong report (planted decoy IOC or attribution) or an executed hijack.
 
 | 86 injected malware samples (strings, decompiled, package, email, ELF) | Qwen2.5-3B | Llama-3.2-3B | Gemma-2-2B |
 |---|---|---|---|
-| defeated, no defense | 33% (28/86) | 57% (49/86) | _pending_ |
-| defeated, **quarantine pipeline** | **0%** (0/86) | **5%** (4/86) | _pending_ |
-| same malware without injection detected (no defense → quarantine) | 100% → 100% | 83% → 100% | _pending_ |
-| benign artifacts flagged (no defense → quarantine) | 95% → 89% | 32% → 68% | _pending_ |
+| defeated, no defense | 33% (28/86) | 57% (49/86) | 60% (52/86)¹ |
+| defeated, **quarantine pipeline** | **0%** (0/86) | **5%** (4/86) | **0%** (0/86) |
+| injection-*induced* failures (clean twin handled correctly), no defense → quarantine | 33% → 0% | 52% → 5% | 33% → 0% |
+| same malware without injection detected (no defense → quarantine) | 100% → 100% | 83% → 100% | 83% → 100% |
+| benign artifacts flagged (no defense → quarantine) | 95% → 89% | 32% → 68% | 53% → 68% |
+
+¹ Includes 29 agent runs in which Gemma executed the privileged allow-list
+tool. Gemma does this on clean malware too (6/6), so it is tool misuse more than
+injection. The induced-failure row removes such cases.
+
+![Failure rate by strategy, no defense vs. quarantine](results/failure_by_strategy.png)
 
 * **What works on these models:** harness mimicry (forged chat turns with a JSON
-  verdict) defeated 70% (Qwen) and 90% (Llama) of samples; cover stories 60% /
-  70%; Skynet-style overrides 40% / 70%. Misdirection put the attacker's decoy
-  IOCs into **every** report.
-* **What doesn't:** Gaslight-style fake system messages and Hades-style refusal
-  bait were the *least* effective (0–20%). Neither 3B model refused or aborted,
-  which is in line with reports that these attacks are unreliable so far.
-  Flooding defeated 0% (Qwen) and 75% (Llama).
-* **radare2 agent on real ELF binaries:** 64% (Qwen) and 50% (Llama) of
-  injected binaries defeated the undefended agent; under quarantine, 0% and 0%.
-* **The cost:** small models over-flag. Qwen calls 95% of benign artifacts
+  verdict) defeated 70% (Qwen), 90% (Llama) and 90% (Gemma) of samples; cover
+  stories 60% / 70% / 90%; Skynet-style overrides 40% / 70% / 60%. Misdirection
+  put the attacker's decoy IOCs or attribution into 10/10 (Qwen), 10/10 (Llama)
+  and 7/10 (Gemma) reports.
+* **What doesn't (yet):** Gaslight-style fake system messages and Hades-style
+  refusal bait were the *least* effective on the two 3B models (0–20%). No model
+  ever refused or aborted, not even the 2B Gemma, which was misled by them more
+  often (40–50%) but answered "benign" rather than giving up. This is in line with
+  reports that these attacks are unreliable so far. Flooding: 0% / 75% / 50%.
+* **radare2 agent on real ELF binaries:** 64% (Qwen), 50% (Llama) and 93% (Gemma)
+  of injected binaries defeated the undefended agent; under quarantine, 0% for all three.
+* **Privileged tools:** Qwen and Llama never used the allow-list tool on malware.
+  Gemma used it in 35 of 38 agent runs on malware, with or without injection.
+  Deferring privileged actions until the final verdict is benign and no
+  manipulation evidence exists (part of the quarantine pipeline) blocked all of them.
+* **The cost:** small models over-flag. Qwen calls 89–95% of benign artifacts
   malicious or suspicious with or without defenses. Quarantine raises Llama's
-  benign flag rate from 32% to 68%, because the evidence framing and the trusted
-  facts (e.g. "overrides the install command") make it more suspicious. These
-  pipelines are first-pass filters, not judges.
+  benign flag rate from 32% to 68% (Gemma 53% → 68%), because the evidence framing
+  and the trusted facts (e.g. "overrides the install command") make it more
+  suspicious. These pipelines are first-pass filters, not judges.
 
 **2. Which defense does the work** (Qwen2.5-3B, the 72 injected samples of the
 core split; the prompt-only variants were not run on the binaries).
@@ -84,8 +97,9 @@ data") barely helps; harness mimicry even rose from 5/8 to 6/8. Adding the
 *evidence* framing ("text addressed to an AI analyst is a sign of malice")
 removes the override and cover-story flips, but neither prompt stops
 misdirection: decoys still reach 7–8 of 8 reports. Escalating the raw verdict
-whenever the detector finds AI-directed text (also Llama: 57% → 22% over all 86)
-fixes the verdict but not the report. Only taking the text out of the model's
+whenever the detector finds AI-directed text (over all 86: Llama 57% → 22%,
+Gemma 60% → 40%) fixes the verdict but neither the report nor an
+already-executed tool call. Only taking the text out of the model's
 view, as quarantine does, fixes both. Cross-model consistency helps little,
 because the same injections fool both families.
 
@@ -116,8 +130,8 @@ works even on benign files: Qwen flags 95% of benign artifacts, but only 25% of
 benign artifacts that carry such a note. The evidence pipeline flags all four for
 human review. The counterfactual check (does the verdict change when the
 quarantined text is removed?) fires on 31% of injected samples and 14% of
-detector-evading ones, versus 0–5% of clean ones, for Qwen. For Llama it is
-noisier (37% on benign files).
+detector-evading ones, versus 0–5% of clean ones, for Qwen. For Llama and Gemma
+it is noisier (26–37% on benign files).
 <!-- RESULTS:END -->
 
 Full tables: [results/tables.md](results/tables.md) (LLM pipelines),
