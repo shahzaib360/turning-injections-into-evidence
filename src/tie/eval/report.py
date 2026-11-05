@@ -303,6 +303,21 @@ def make_report(benchmark_paths: list[str], result_paths: list[str], out_dir: st
                     lines.append(f"| {_label(m)} | {d} | {pct(sum(o.failure for o in o_sel), len(o_sel))} | {pct(sum(o.failure for o in a_sel), len(a_sel))} |")
         summary["table6"] = t6
 
+    # --- Consistency signals as injection detectors ---------------------------------------
+    t7 = _consistency_signals(samples, reports, adaptive_ids, gray_ids)
+    if t7:
+        lines.append("\n### Table 7. Consistency checks as injection detectors\n")
+        lines.append("How often each check *fires* (verdicts disagree), by sample group. A useful signal fires on injected "
+                     "samples and stays quiet on clean ones. Counterfactual = raw vs. quarantined view of the same model; "
+                     "cross-model = Qwen2.5-3B vs. Llama-3.2-3B on the raw view.\n")
+        groups = ["benign (clean)", "malicious (clean)", "injected (detector-flagged)", "injected (not addressed to AI)",
+                  "adaptive (evades detector)"]
+        lines.append("| Check | " + " | ".join(groups) + " |")
+        lines.append("|---" * (1 + len(groups)) + "|")
+        for check, vals in t7.items():
+            lines.append(f"| {check} | " + " | ".join(pct(*vals.get(g, (0, 0))) if vals.get(g, (0, 0))[1] else "-" for g in groups) + " |")
+        summary["table7"] = {k: {g: list(v) for g, v in d.items()} for k, d in t7.items()}
+
     lines.append(f"\n_{len(reports)} model runs scored ({len(errors)} runs ended in a pipeline error and are excluded)._\n")
     (out / "tables.md").write_text("\n".join(lines))
     (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str))
@@ -312,6 +327,58 @@ def make_report(benchmark_paths: list[str], result_paths: list[str], out_dir: st
         print(f"(figures skipped: {e})")
     print("\n".join(lines))
     return summary
+
+
+def _consistency_signals(samples, reports, adaptive_ids, gray_ids) -> dict:
+    """Fire rates of the counterfactual and cross-model checks per sample group."""
+    by = collections.defaultdict(dict)
+    for r in reports:
+        by[(r.sample_id, r.model)][r.defense] = r
+
+    flagged_cache: dict[str, bool] = {}
+
+    def group(sid: str) -> str | None:
+        s = samples[sid]
+        if sid in gray_ids:
+            return None
+        if sid in adaptive_ids:
+            return "adaptive (evades detector)"
+        if s.injection is None:
+            return "benign (clean)" if s.label == "benign" else "malicious (clean)"
+        if s.injection.strategy in ("context_flood", "cover_story_implicit"):
+            return "injected (not addressed to AI)"
+        if sid not in flagged_cache:
+            flagged_cache[sid] = s.artifact_type == "binary" or det_mod.analyze_sample(s).flagged
+        return "injected (detector-flagged)" if flagged_cache[sid] else "injected (not addressed to AI)"
+
+    out: dict[str, dict[str, list[int]]] = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0]))
+    for (sid, model), runs in by.items():
+        if sid not in samples or "none" not in runs or "quarantine" not in runs:
+            continue
+        g = group(sid)
+        if g is None:
+            continue
+        _, changed = consistency.counterfactual(runs["none"], runs["quarantine"])
+        cell = out[f"counterfactual ({_label(model)})"][g]
+        cell[0] += int(changed)
+        cell[1] += 1
+    none_by_sid: dict[str, dict[str, TriageReport]] = collections.defaultdict(dict)
+    for r in reports:
+        if r.defense == "none":
+            none_by_sid[r.sample_id][r.model] = r
+    for sid, ms in none_by_sid.items():
+        q = [r for m, r in ms.items() if m.startswith("qwen")]
+        ll = [r for m, r in ms.items() if m.startswith("Llama")]
+        if not q or not ll or sid not in samples:
+            continue
+        g = group(sid)
+        if g is None:
+            continue
+        _, dis = consistency.cross_model([q[0], ll[0]])
+        cell = out["cross-model (Qwen vs Llama)"][g]
+        cell[0] += int(dis)
+        cell[1] += 1
+    return {k: {g: tuple(v) for g, v in d.items()} for k, d in out.items()}
 
 
 def _figures(main, adapt, outcomes, models, out: Path) -> None:
