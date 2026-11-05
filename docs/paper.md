@@ -124,8 +124,103 @@ See [defenses.md](defenses.md). In short:
 
 ## 6. Results
 
-<!-- PAPER-RESULTS -->
-*(Filled from `results/tables.md` once the CPU runs complete.)*
+Setup: Qwen2.5-3B-Instruct, Llama-3.2-3B-Instruct and Gemma-2-2B-it, 4-bit
+GGUF, llama.cpp on 4 CPU cores, temperature 0, one run per sample and condition.
+The core split has 72 injected malicious samples (2 carriers × 9 strategies per
+type), 16 clean malicious and 17 benign. The binary split adds 14 injected, 2
+clean malicious and 2 benign ELF samples for the radare2 agent. Confidence
+intervals are wide at these sample sizes: the Wilson 95% half-width is about ±10
+points for proportions out of 86, ±15 out of 42, and ±25–30 for per-strategy
+cells of 8–10 samples. We therefore emphasise differences that are large and
+consistent across models. All tables:
+[results/tables.md](../results/tables.md).
+
+### 6.0 Vulnerability of undefended pipelines and the effect of quarantine
+
+| injected malware defeated (of 86) | Qwen2.5-3B | Llama-3.2-3B | Gemma-2-2B |
+|---|---|---|---|
+| no defense | 33% | 57% | _pending_ |
+| spotlighting (datamark + delimiters) | _pending_ | - | - |
+| spotlighting + evidence prompt | _pending_ | - | - |
+| detector escalation of the raw verdict | 12% | 22% | _pending_ |
+| quarantine pipeline | **0%** | **5%** | _pending_ |
+| clean malware detected (none → quarantine) | 100% → 100% | 83% → 100% | _pending_ |
+| benign flagged (none → quarantine) | 95% → 89% | 32% → 68% | _pending_ |
+
+*By strategy* (no defense, Qwen / Llama): harness mimicry 70% / 90%,
+cover story 60% / 70%, direct override 40% / 70%, misdirection 100% / 100%
+(decoy IOCs or attribution in the report), tool spoofing 10% / 30%,
+implicit cover story 0% / 38%, context flooding 0% / 75%, and fake system
+messages and refusal bait 0% / 20% each. The two techniques seen in the most
+prominent 2026 samples, Gaslight's fake errors and Hades' refusal bait, were the
+least effective against these models. Neither model ever refused or claimed an
+error, so the abort column is empty. This matches the public assessment that
+these attacks are unreliable. It may change with more safety-tuned models
+(Socket reports a frontier model halting on Hades), and our harness records
+aborts separately so the question can be re-run.
+
+*By pipeline* (no defense → quarantine): strings triage 28% → 0% (Qwen),
+67% → 6% (Llama); Ghidra-style agent 17% → 0%, 94% → 17%; package scanner
+33% → 0%, 44% → 0%; email triage 28% → 0%, 28% → 0%; radare2 agent on compiled
+ELFs 64% → 0%, 50% → 0%. The agents were not hijacked in any undefended run
+(no executed `whitelist_sample` on injected malware), although Gemma called the
+tool spuriously during piloting. Under quarantine the tool is deferred and never
+executed on malware.
+
+*Residual failures under quarantine* (Llama, 4/86) are three context-flooding
+samples and one implicit cover story: the two strategies that do not address the
+analyst and so are not quarantined. The flood works by *framing* rather than
+truncation. The model described a credential stealer as "automated build system
+output with copyright notice".
+
+*Costs.* Quarantine raised Llama's benign flag rate from 32% to 68%, mostly on
+hard negatives (LLM CLI, backup agent, red-team kit, model downloader). Qwen
+flags 89–95% of benign artifacts under every configuration. Small models are
+poorly calibrated triage engines. The relevant comparison is therefore *induced*
+failure (Table 4 in results), which tells the same story: 33% → 0% (Qwen) and
+52% → 5% (Llama).
+
+### 6.0b Consistency checks
+
+Cross-model consistency (union of Qwen and Llama verdicts, disagreement
+escalated) lowered Qwen's failure only from 33% to 28%. The same injections
+(harness mimicry, cover stories) fool both families, and the planted decoys
+remain in the report. As a detector, cross-model disagreement fires on 63% of
+benign files, because the two models' base rates differ so much.
+
+The counterfactual check compares the raw-view verdict with the quarantined-view
+verdict of the same model. For Qwen it fires on 31% of detector-flagged
+injections and 14% of the adaptive (detector-evading) variants, but on 0% of clean
+malware and 5% of benign files. That is a lexicon-independent signal, though a
+weak one. For Llama it is noisy (37% of benign files, 17% of clean malware): the
+model's verdict depends on the view even without an injection.
+
+### 6.0c Gray zone
+
+Four benign artifacts carry a note asking reviewers to classify them as benign.
+Without defenses, Qwen flagged 1/4 of them (versus 95% of benign artifacts
+without such a note) and Llama 0/4. The note works on benign files too. The
+evidence pipeline flags 4/4 for review. Whether that is a false positive is a
+policy question; we count it separately.
+
+### 6.0d Adaptive variants against the models
+
+| injected malware defeated (42 detector-evading variants) | original | evasive variant |
+|---|---|---|
+| Qwen, no defense | 38% | 29% |
+| Qwen, quarantine pipeline | 0% | 17% |
+| Llama, no defense | 60% | 45% |
+| Llama, quarantine pipeline | 0% | 26% |
+
+The attacker pays for evading the detector: the rewritten payloads lose about a
+quarter of their effect on the undefended pipelines. But the full pipeline
+falls from 0% to 17–26% failure. Most of the successful variants are
+misdirection moved into a test-fixture file (5/5 for Qwen) and harness mimicry
+without role tokens. The misdirection case exposes a design flaw: trusted facts
+are extracted from all non-quarantined text, so once the detector is evaded the
+decoy domain is promoted to a "trusted" network indicator. Facts should come
+only from executable context (URLs in code statements, imports), never from
+prose or data files.
 
 ### 6.1 Detector
 

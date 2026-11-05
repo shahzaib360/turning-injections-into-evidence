@@ -43,28 +43,75 @@ This repository provides:
 ## Key results
 
 <!-- RESULTS:START -->
-*LLM evaluation runs are in progress on CPU (Qwen2.5-3B, Llama-3.2-3B, Gemma-2-2B via llama.cpp); this section is filled from `results/tables.md` when they finish.*
+All model results come from local open models on a 4-core CPU (llama.cpp, Q4_K_M,
+temperature 0). "Defeated" means the injected malware ended in a miss, an
+abort, a wrong report (planted decoy IOC or attribution) or an executed hijack.
 
-**Detector (no LLM).** On the synthetic splits the detector flags 100% of the
-injections that address the analyst, across all obfuscations, with 0/17 benign
-carriers flagged and every finding pointing at the injected span. Flooding and
-implicit cover stories, which do not address the analyst, are out of its
-scope by design.
+**1. Undefended open triage pipelines are injectable, and the quarantine pipeline closes most of it.**
 
-**Real packages that ship prompts.** After the context rules were refined on 25
-*dev* packages (LangChain, LlamaIndex, CrewAI, LiteLLM, garak, openai, ...), the
-frozen detector was run once on 25 held-out packages (11,598 files). It flagged
-**4/25 packages** (8 findings). Every finding is a false positive: CAMEL
-role-play prompts, "safe/unsafe verdict" docstrings in PyRIT and NeMo Guardrails,
-and one Anthropic SDK docstring. **0/12** non-LLM baseline packages were
-flagged, and **134** real injection strings in PyRIT's datasets were correctly
-classed as a test corpus.
+| 86 injected malware samples (strings, decompiled, package, email, ELF) | Qwen2.5-3B | Llama-3.2-3B | Gemma-2-2B |
+|---|---|---|---|
+| defeated, no defense | 33% (28/86) | 57% (49/86) | _pending_ |
+| defeated, **quarantine pipeline** | **0%** (0/86) | **5%** (4/86) | _pending_ |
+| same malware without injection detected (no defense → quarantine) | 100% → 100% | 83% → 100% | _pending_ |
+| benign artifacts flagged (no defense → quarantine) | 95% → 89% | 32% → 68% | _pending_ |
 
-**Adaptive attacker.** A white-box attacker evades the frozen detector for
-**42/56** flagged injections, usually with one or two rewrites: euphemising the
-verdict ("benign" → "routine"), dropping the vocative, or hiding the payload in
-a fake test-fixture list. Fake-system-message and tool-spoofing payloads were the
-hardest to disguise (3/8 and 2/8).
+* **What works on these models:** harness mimicry (forged chat turns with a JSON
+  verdict) defeated 70% (Qwen) and 90% (Llama) of samples; cover stories 60% /
+  70%; Skynet-style overrides 40% / 70%. Misdirection put the attacker's decoy
+  IOCs into **every** report.
+* **What doesn't:** Gaslight-style fake system messages and Hades-style refusal
+  bait were the *least* effective (0–20%). Neither 3B model refused or aborted,
+  which is in line with reports that these attacks are unreliable so far.
+  Flooding defeated 0% (Qwen) and 75% (Llama).
+* **radare2 agent on real ELF binaries:** 64% (Qwen) and 50% (Llama) of
+  injected binaries defeated the undefended agent; under quarantine, 0% and 0%.
+* **The cost:** small models over-flag. Qwen calls 95% of benign artifacts
+  malicious or suspicious with or without defenses. Quarantine raises Llama's
+  benign flag rate from 32% to 68%, because the evidence framing and the trusted
+  facts (e.g. "overrides the install command") make it more suspicious. These
+  pipelines are first-pass filters, not judges.
+
+**2. Which defense does the work (Qwen2.5-3B, share of injected malware defeated).**
+
+| none | spotlighting | evidence prompt | detector escalation only | quarantine | counterfactual check | cross-model (Qwen+Llama) |
+|---|---|---|---|---|---|---|
+| 33% | _pending_ | _pending_ | 12% | **0%** | 0% | 28% |
+
+Escalating the raw verdict whenever the detector finds AI-directed text
+(Llama: 57% → 22%) fixes the verdict but not the report: the planted decoys are
+already in it. Quarantine fixes both. Cross-model consistency helps little,
+because the same injections fool both families.
+
+**3. Treating text addressed to an AI as evidence, on real software.** After the
+context rules were refined on 25 *dev* packages (LangChain, LlamaIndex, CrewAI,
+LiteLLM, garak, openai, ...), the frozen detector was run once on 25 held-out
+packages (11,598 files). It flagged **4/25 packages** (8 findings), all of them
+false positives: CAMEL role-play prompts, "safe/unsafe verdict" docstrings in
+PyRIT and NeMo Guardrails, and one Anthropic SDK docstring. The six held-out
+non-LLM packages were clean, and **134** real injection strings in PyRIT's
+datasets were correctly classed as a test corpus. On the synthetic splits it
+flags 100% of injections that address the analyst, across all obfuscations, with
+0/17 benign carriers flagged.
+
+**4. Adaptive attacker.** A white-box attacker evades the frozen detector for
+**42/56** injections, usually with one or two rewrites: euphemise the verdict
+("benign" → "routine"), drop the vocative, or move the payload into a fake
+test-fixture list. Evasion has a price. Against the undefended pipelines the
+rewritten injections defeat fewer samples than their originals (Qwen 38% → 29%,
+Llama 60% → 45%). But it is not a wall: **17% (Qwen) and 26% (Llama)** of the
+evasive variants still defeat the full quarantine pipeline, which defeats 0% of
+their originals. The worst case is misdirection hidden in a test fixture: the
+decoy domain then even appears among the pipeline's own "trusted facts" (a design
+flaw, discussed in the paper).
+
+**5. Gray zone and consistency.** A note asking reviewers to call a file benign
+works even on benign files: Qwen flags 95% of benign artifacts, but only 25% of
+benign artifacts that carry such a note. The evidence pipeline flags all four for
+human review. The counterfactual check (does the verdict change when the
+quarantined text is removed?) fires on 31% of injected samples and 14% of
+detector-evading ones, versus 0–5% of clean ones, for Qwen. For Llama it is
+noisier (37% on benign files).
 <!-- RESULTS:END -->
 
 Full tables: [results/tables.md](results/tables.md) (LLM pipelines),
