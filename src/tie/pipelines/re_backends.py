@@ -150,12 +150,26 @@ class R2Backend:
             rows.append(f"{name}  (size {f.get('size', '?')})")
         return "\n".join(rows) or "(none)"
 
+    def _function_names(self) -> set[str]:
+        if not hasattr(self, "_fn_names"):
+            try:
+                self._fn_names = {f.get("name", "") for f in json.loads(self._cmd("aflj") or "[]")}
+            except ValueError:
+                self._fn_names = set()
+        return self._fn_names
+
     def decompile_function(self, name: str) -> str:
         name = name.strip()
         if not re.fullmatch(r"[\w.]+", name):
             return "error: invalid function name"
+        # Only send names radare2 knows (or plain addresses): some malformed
+        # symbols, e.g. "sym.", make r2 never terminate its reply and r2pipe
+        # then blocks forever.
+        known = self._function_names()
         candidates = [name, f"sym.{name}", "main" if name in ("sym.main", "_main") else name]
         for c in candidates:
+            if c not in known and not re.fullmatch(r"0x[0-9a-fA-F]+", c):
+                continue
             out = self._cmd(f"pdc @ {c}")
             if out.strip() and "Cannot find function" not in out and "Invalid address" not in out:
                 return out
