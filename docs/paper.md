@@ -140,12 +140,23 @@ consistent across models. All tables:
 | injected malware defeated (of 86) | Qwen2.5-3B | Llama-3.2-3B | Gemma-2-2B |
 |---|---|---|---|
 | no defense | 33% | 57% | _pending_ |
-| spotlighting (datamark + delimiters) | _pending_ | - | - |
-| spotlighting + evidence prompt | _pending_ | - | - |
+| spotlighting (datamark + delimiters)¹ | 22% | - | - |
+| spotlighting + evidence prompt¹ | 17% | - | - |
 | detector escalation of the raw verdict | 12% | 22% | _pending_ |
 | quarantine pipeline | **0%** | **5%** | _pending_ |
 | clean malware detected (none → quarantine) | 100% → 100% | 83% → 100% | _pending_ |
 | benign flagged (none → quarantine) | 95% → 89% | 32% → 68% | _pending_ |
+
+¹ Run on the 72 core samples only (no ELF binaries). On the same 72 samples
+Qwen's undefended failure is 26%, detector escalation 11%, quarantine 0% and
+cross-model 24%.
+
+*Prompt-only defenses.* Spotlighting barely moves the needle (26% → 22%), and
+harness mimicry got slightly *more* effective (5/8 → 6/8). Adding the evidence
+framing helps more (17%): override and cover-story flips disappear (2/8 → 0/8,
+4/8 → 0/8). But misdirection is untouched, with decoys in 8/8 and 7/8 reports.
+A model that is told the text is untrusted still copies "facts" out of it. Only
+removing the text from the view (quarantine) prevents that.
 
 *By strategy* (no defense, Qwen / Llama): harness mimicry 70% / 90%,
 cover story 60% / 70%, direct override 40% / 70%, misdirection 100% / 100%
