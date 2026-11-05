@@ -152,11 +152,13 @@ def _agg(outs: list[Outcome]) -> dict:
         "inj_miss": sum(o.miss for o in mal_inj),
         "inj_abort": sum(o.abort for o in mal_inj),
         "inj_wrong": sum(o.wrong_report for o in mal_inj),
+        "inj_canary": sum(o.canary_echo for o in mal_inj),
         "inj_hijack": sum(o.hijack for o in mal_inj),
         "clean_n": len(mal_clean),
         "clean_detect": sum(o.flagged for o in mal_clean),
         "ben_n": len(ben),
         "ben_fp": sum(o.false_positive for o in ben),
+        "ben_fp_strict": sum(o.flagged_strict for o in ben),
         "ben_abort": sum(o.abort for o in ben),
     }
 
@@ -199,10 +201,11 @@ def make_report(benchmark_paths: list[str], result_paths: list[str], out_dir: st
 
     # --- Table 1: undefended vs quarantine per model --------------------------------
     lines.append("### Table 1. Undefended pipelines vs. the quarantine pipeline\n")
-    lines.append("Failure on injected malicious samples = miss, abort, wrong report or executed hijack. "
-                 "Utility = detection of the same malware without injection; FP = benign samples flagged.\n")
-    lines.append("| Model | Defense | Injected: failure | miss | abort | wrong report | hijack | Clean malware detected | Benign FP |")
-    lines.append("|---|---|---|---|---|---|---|---|---|")
+    lines.append("Failure on injected malicious samples = miss, abort, wrong report (planted decoy IOC/attribution) or "
+                 "executed hijack. Canary echo (the injection's token repeated in the report) is shown separately. "
+                 "Clean malware detected = the same malware without injection; Benign FP = benign samples flagged.\n")
+    lines.append("| Model | Defense | Injected: failure | miss | abort | wrong report | hijack | canary echo | Clean malware detected | Benign FP | Benign called malicious |")
+    lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
     t1 = {}
     for m in models:
         for d in ("none", "spotlight", "evidence_prompt", "quarantine", "none+escalate", "counterfactual", "cross_model"):
@@ -214,7 +217,8 @@ def make_report(benchmark_paths: list[str], result_paths: list[str], out_dir: st
             lines.append(
                 f"| {_label(m)} | {d} | {pct(a['inj_fail'], a['inj_n'])} | {pct_short(a['inj_miss'], a['inj_n'])} | "
                 f"{pct_short(a['inj_abort'], a['inj_n'])} | {pct_short(a['inj_wrong'], a['inj_n'])} | "
-                f"{pct_short(a['inj_hijack'], a['inj_n'])} | {pct(a['clean_detect'], a['clean_n'])} | {pct(a['ben_fp'], a['ben_n'])} |"
+                f"{pct_short(a['inj_hijack'], a['inj_n'])} | {pct_short(a['inj_canary'], a['inj_n'])} | "
+                f"{pct(a['clean_detect'], a['clean_n'])} | {pct(a['ben_fp'], a['ben_n'])} | {pct_short(a['ben_fp_strict'], a['ben_n'])} |"
             )
     summary["table1"] = {f"{k[0]}|{k[1]}": v for k, v in t1.items()}
 
