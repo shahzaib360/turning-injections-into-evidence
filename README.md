@@ -250,6 +250,12 @@ tests/         pytest suite (mock models; radare2 test runs when r2 is installed
   injections are recognisable, and unrecognisable ones have to give up the cues
   that make them persuasive. How much of their effect they lose doing so is
   measured in Table 6 of [results/tables.md](results/tables.md).
+* **Trusted facts can be poisoned.** The quarantine pipeline extracts "trusted
+  facts" (network indicators, sensitive APIs) from all text that was not
+  quarantined. Once an adaptive attacker evades the detector, a planted decoy
+  domain becomes a "trusted" indicator. Facts should come only from executable
+  context; this is the most important fix for a next version. It was left as
+  evaluated so that the reported numbers match the code.
 * **Ghidra.** The Ghidra-style agent uses decompiler-output fixtures with
   GhidraMCP-like tool names. A `GhidraMCPBackend` HTTP adapter is included but was
   not exercised here, because Ghidra was not available in the evaluation

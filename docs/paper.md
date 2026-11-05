@@ -16,13 +16,18 @@ pipelines (a radare2 agent, a Ghidra-style agent, an LLM package scanner, and
 strings and email triage) scored for misses, aborted analyses, wrong reports and
 agent hijacks; and (iii) defenses that quarantine artifact text, check verdict
 consistency across views and models, and treat text addressed to an AI as
-evidence of malice. On held-out real packages that ship LLM prompts the
-evidence detector flags 4 of 25 packages (16%, all false positives, none among
-non-LLM packages). A white-box adaptive attacker evades it in 42 of 56 cases.
-The question that decides whether "injections as evidence" is a sound
-principle is whether the evasive rewrites still work on the model. Section 6
-answers it for the models we could run.
-<!-- ABSTRACT-RESULTS -->
+evidence of malice. On two 3B open models, published-style injections defeat
+33% (Qwen2.5-3B) and 57% (Llama-3.2-3B) of injected malware samples in
+undefended pipelines, including a radare2 agent on real ELF binaries. The
+quarantine pipeline reduces this to 0% and 5%, at the cost of more false
+positives for the better-calibrated model. Prompt-only defenses
+(spotlighting, an "evidence" instruction) leave planted decoys in almost every
+report. On held-out real packages that ship LLM prompts, the evidence detector
+flags 4 of 25 packages (all false positives, none among non-LLM packages). A
+white-box adaptive attacker evades it in 42 of 56 cases. Evasion costs the
+attacker about a quarter of the injection's effect, but 17–26% of the evasive
+variants still get through the full pipeline. Injections are good evidence
+against today's attacks, not a security boundary.
 
 ## 1. Introduction
 
