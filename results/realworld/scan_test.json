@@ -1,0 +1,381 @@
+[
+ {
+  "package": "pypi:langchain",
+  "split": "test",
+  "category": "llm",
+  "artifact": "langchain-1.4.9-py3-none-any.whl",
+  "files": 42,
+  "chars": 662639,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 2.5
+ },
+ {
+  "package": "pypi:langchain-community",
+  "split": "test",
+  "category": "llm",
+  "artifact": "langchain_community-0.4.2-py3-none-any.whl",
+  "files": 1205,
+  "chars": 8266035,
+  "dispositions": {
+   "llm_prompt": 2
+  },
+  "manipulation_findings": [],
+  "seconds": 9.8
+ },
+ {
+  "package": "pypi:dspy",
+  "split": "test",
+  "category": "llm",
+  "artifact": "dspy-3.4.1-py3-none-any.whl",
+  "files": 256,
+  "chars": 3030826,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 5.9
+ },
+ {
+  "package": "pypi:autogen-agentchat",
+  "split": "test",
+  "category": "llm",
+  "artifact": "autogen_agentchat-0.7.5-py3-none-any.whl",
+  "files": 45,
+  "chars": 477536,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.9
+ },
+ {
+  "package": "pypi:haystack-ai",
+  "split": "test",
+  "category": "llm",
+  "artifact": "haystack_ai-3.4.1-py3-none-any.whl",
+  "files": 294,
+  "chars": 2543278,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 4.0
+ },
+ {
+  "package": "pypi:instructor",
+  "split": "test",
+  "category": "llm",
+  "artifact": "instructor-1.17.0-py3-none-any.whl",
+  "files": 200,
+  "chars": 999200,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.5
+ },
+ {
+  "package": "pypi:anthropic",
+  "split": "test",
+  "category": "llm",
+  "artifact": "anthropic-2.5.0-py3-none-any.whl",
+  "files": 2794,
+  "chars": 7738815,
+  "dispositions": {
+   "manipulation": 1
+  },
+  "manipulation_findings": [
+   {
+    "file": "anthropic/lib/tools/_beta_session_runner.py",
+    "score": 3.4,
+    "categories": {
+     "fake_system": 1.5,
+     "analysis_ref": 1.0,
+     "misdirection": 1.4
+    },
+    "concealment": [],
+    "excerpt": "Enqueue `ev` for dispatch, honoring its evaluated permission.\n\n        A builtin call the server gated behind user confirmation\n        (`evaluated_permission == \"ask\"`, e.g. the `always_ask` policy) is\n        held until the matching `user"
+   }
+  ],
+  "seconds": 9.7
+ },
+ {
+  "package": "pypi:smolagents",
+  "split": "test",
+  "category": "llm",
+  "artifact": "smolagents-1.26.0-py3-none-any.whl",
+  "files": 26,
+  "chars": 591970,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.6
+ },
+ {
+  "package": "pypi:langgraph",
+  "split": "test",
+  "category": "llm",
+  "artifact": "langgraph-1.2.19-py3-none-any.whl",
+  "files": 80,
+  "chars": 1077564,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.5
+ },
+ {
+  "package": "pypi:ragas",
+  "split": "test",
+  "category": "llm",
+  "artifact": "ragas-0.4.3-py3-none-any.whl",
+  "files": 244,
+  "chars": 1523781,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 2.7
+ },
+ {
+  "package": "pypi:aider-chat",
+  "split": "test",
+  "category": "llm",
+  "artifact": "aider_chat-0.16.0-py3-none-any.whl",
+  "files": 52,
+  "chars": 279840,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.9
+ },
+ {
+  "package": "pypi:marvin",
+  "split": "test",
+  "category": "llm",
+  "artifact": "marvin-3.2.10-py3-none-any.whl",
+  "files": 74,
+  "chars": 351397,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.0
+ },
+ {
+  "package": "pypi:camel-ai",
+  "split": "test",
+  "category": "llm",
+  "artifact": "camel_ai-0.2.90-py3-none-any.whl",
+  "files": 526,
+  "chars": 6286921,
+  "dispositions": {
+   "llm_prompt": 2,
+   "manipulation": 3
+  },
+  "manipulation_findings": [
+   {
+    "file": "camel/prompts/ai_society.py",
+    "score": 4.0,
+    "categories": {
+     "mention": 0.3,
+     "refusal_bait": 2.0,
+     "address": 1.0
+    },
+    "concealment": [],
+    "excerpt": "===== RULES OF ASSISTANT =====\nNever forget you are a {assistant_role} and I am a {user_role}. Never flip roles! Never instruct me!\nWe share a common interest in collaborating to successfully complete a task.\nYou must help me to complete th"
+   },
+   {
+    "file": "camel/prompts/ai_society.py",
+    "score": 4.8,
+    "categories": {
+     "address": 1.2,
+     "override": 0.6,
+     "refusal_bait": 2.0
+    },
+    "concealment": [],
+    "excerpt": "===== RULES OF USER =====\nNever forget you are a {user_role} and I am a {assistant_role}. Never flip roles! You will always instruct me.\nWe share a common interest in collaborating to successfully complete a task.\nI must help you to complet"
+   },
+   {
+    "file": "camel/prompts/code.py",
+    "score": 4.8,
+    "categories": {
+     "address": 1.2,
+     "override": 0.6,
+     "refusal_bait": 2.0
+    },
+    "concealment": [],
+    "excerpt": "Never forget you are a person working in {domain} and I am a Computer programmer. Never flip roles! You will always instruct me.\nWe share a common interest in collaborating to successfully complete a task.\nI must help you to complete the ta"
+   }
+  ],
+  "seconds": 7.5
+ },
+ {
+  "package": "pypi:pyrit",
+  "split": "test",
+  "category": "llm-security",
+  "artifact": "pyrit-1.1.0-py3-none-any.whl",
+  "files": 1570,
+  "chars": 12320553,
+  "dispositions": {
+   "corpus": 134,
+   "llm_prompt": 1,
+   "manipulation": 3
+  },
+  "manipulation_findings": [
+   {
+    "file": "pyrit/datasets/seed_datasets/remote/hixstest_dataset.py",
+    "score": 4.2,
+    "categories": {
+     "mention": 0.3,
+     "verdict_steer": 2.2,
+     "address": 1.0
+    },
+    "concealment": [],
+    "excerpt": "\n    Loader for the HiXSTest (Hindi Exaggerated-Safety Test) dataset from HuggingFace.\n\n    HiXSTest is a manually-curated set of 50 exaggerated-safety prompts in Hindi (with\n    English translations), companion to SGXSTest. It tests whethe"
+   },
+   {
+    "file": "pyrit/datasets/seed_datasets/remote/sgxstest_dataset.py",
+    "score": 4.2,
+    "categories": {
+     "mention": 0.3,
+     "verdict_steer": 2.2,
+     "address": 1.0
+    },
+    "concealment": [],
+    "excerpt": "\n    Loader for the SGXSTest (Singapore exaggerated-safety test) dataset from HuggingFace.\n\n    SGXSTest contains 100 manually-curated safe/unsafe prompt pairs (200 prompts total) that\n    test exaggerated-safety behavior of LLMs in a Singa"
+   },
+   {
+    "file": "pyrit/memory/memory_interface.py",
+    "score": 3.7,
+    "categories": {
+     "verdict_steer": 2.2,
+     "analysis_ref": 1.0
+    },
+    "concealment": [],
+    "excerpt": "\n        Build a validated backend-specific attack-label condition.\n\n        Returns:\n            list[Any]: The backend-specific label condition, if labels are effective.\n\n        Raises:\n            ValueError: If a label key falls outsid"
+   }
+  ],
+  "seconds": 22.8
+ },
+ {
+  "package": "pypi:nemoguardrails",
+  "split": "test",
+  "category": "llm-security",
+  "artifact": "nemoguardrails-0.24.1-py3-none-any.whl",
+  "files": 445,
+  "chars": 3011393,
+  "dispositions": {
+   "manipulation": 1
+  },
+  "manipulation_findings": [
+   {
+    "file": "nemoguardrails/llm/output_parsers.py",
+    "score": 3.7,
+    "categories": {
+     "mention": 0.3,
+     "verdict_steer": 2.2,
+     "analysis_ref": 1.0
+    },
+    "concealment": [],
+    "excerpt": "Helper function to extract the safe/unsafe verdict for a given field.\n\n    Args:\n        response: The model response text, with or without a reasoning trace.\n        field_name: The field to look for (e.g. \"User Safety\" or \"Response Safety"
+   }
+  ],
+  "seconds": 4.1
+ },
+ {
+  "package": "pypi:rebuff",
+  "split": "test",
+  "category": "llm-security",
+  "artifact": "rebuff-0.0.5-py3-none-any.whl",
+  "files": 4,
+  "chars": 7954,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.6
+ },
+ {
+  "package": "npm:@anthropic-ai/sdk",
+  "split": "test",
+  "category": "llm",
+  "artifact": "1.5.0",
+  "files": 1424,
+  "chars": 10583930,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 12.5
+ },
+ {
+  "package": "npm:@langchain/core",
+  "split": "test",
+  "category": "llm",
+  "artifact": "1.3.4",
+  "files": 923,
+  "chars": 2713568,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 2.6
+ },
+ {
+  "package": "npm:llamaindex",
+  "split": "test",
+  "category": "llm",
+  "artifact": "0.12.1",
+  "files": 71,
+  "chars": 910667,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.1
+ },
+ {
+  "package": "pypi:flask",
+  "split": "test",
+  "category": "baseline",
+  "artifact": "flask-3.1.3-py3-none-any.whl",
+  "files": 28,
+  "chars": 342356,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.0
+ },
+ {
+  "package": "pypi:rich",
+  "split": "test",
+  "category": "baseline",
+  "artifact": "rich-15.0.0-py3-none-any.whl",
+  "files": 101,
+  "chars": 1201105,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 29.6
+ },
+ {
+  "package": "pypi:pyyaml",
+  "split": "test",
+  "category": "baseline",
+  "artifact": "pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+  "files": 20,
+  "chars": 221270,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.7
+ },
+ {
+  "package": "pypi:pytest",
+  "split": "test",
+  "category": "baseline",
+  "artifact": "pytest-9.2.0-py3-none-any.whl",
+  "files": 85,
+  "chars": 1440373,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.9
+ },
+ {
+  "package": "pypi:urllib3",
+  "split": "test",
+  "category": "baseline",
+  "artifact": "urllib3-2.8.0-py3-none-any.whl",
+  "files": 39,
+  "chars": 446824,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.4
+ },
+ {
+  "package": "npm:lodash",
+  "split": "test",
+  "category": "baseline",
+  "artifact": "4.18.1",
+  "files": 1050,
+  "chars": 1411781,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 2.3
+ }
+]

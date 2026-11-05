@@ -1,0 +1,294 @@
+[
+ {
+  "package": "pypi:langchain-core",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "langchain_core-1.7.6-py3-none-any.whl",
+  "files": 185,
+  "chars": 2455961,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 3.0
+ },
+ {
+  "package": "pypi:llama-index-core",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "llama_index_core-0.14.25-py3-none-any.whl",
+  "files": 525,
+  "chars": 2767196,
+  "dispositions": {
+   "llm_prompt": 1
+  },
+  "manipulation_findings": [],
+  "seconds": 2.2
+ },
+ {
+  "package": "pypi:crewai",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "crewai-1.15.35-py3-none-any.whl",
+  "files": 557,
+  "chars": 4939092,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 5.2
+ },
+ {
+  "package": "pypi:semantic-kernel",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "semantic_kernel-1.46.0-py3-none-any.whl",
+  "files": 571,
+  "chars": 3408427,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 2.8
+ },
+ {
+  "package": "pypi:guidance",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "guidance-0.3.1-py3-none-any.whl",
+  "files": 66,
+  "chars": 409943,
+  "dispositions": {
+   "llm_prompt": 3
+  },
+  "manipulation_findings": [],
+  "seconds": 0.3
+ },
+ {
+  "package": "pypi:openai",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "openai-3.45.0-py3-none-any.whl",
+  "files": 2085,
+  "chars": 9390965,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 13.7
+ },
+ {
+  "package": "pypi:litellm",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "litellm-1.108.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+  "files": 3459,
+  "chars": 53433570,
+  "dispositions": {
+   "llm_prompt": 5,
+   "corpus": 6,
+   "quotation": 1
+  },
+  "manipulation_findings": [],
+  "seconds": 70.6
+ },
+ {
+  "package": "pypi:pydantic-ai-slim",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "pydantic_ai_slim-2.66.0-py3-none-any.whl",
+  "files": 490,
+  "chars": 10053922,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 12.4
+ },
+ {
+  "package": "pypi:mem0ai",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "mem0ai-2.2.1-py3-none-any.whl",
+  "files": 150,
+  "chars": 1275358,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.6
+ },
+ {
+  "package": "pypi:deepeval",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "deepeval-4.3.3-py3-none-any.whl",
+  "files": 1003,
+  "chars": 5184111,
+  "dispositions": {
+   "corpus": 1
+  },
+  "manipulation_findings": [],
+  "seconds": 4.7
+ },
+ {
+  "package": "pypi:open-interpreter",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "open_interpreter-0.4.3-py3-none-any.whl",
+  "files": 145,
+  "chars": 722941,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.9
+ },
+ {
+  "package": "pypi:outlines",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "outlines-1.3.3-py3-none-any.whl",
+  "files": 50,
+  "chars": 411515,
+  "dispositions": {
+   "llm_prompt": 1,
+   "quotation": 1
+  },
+  "manipulation_findings": [],
+  "seconds": 0.5
+ },
+ {
+  "package": "pypi:browser-use",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "browser_use-0.13.14-py3-none-any.whl",
+  "files": 183,
+  "chars": 2552355,
+  "dispositions": {
+   "quotation": 1
+  },
+  "manipulation_findings": [],
+  "seconds": 3.6
+ },
+ {
+  "package": "pypi:garak",
+  "split": "dev",
+  "category": "llm-security",
+  "artifact": "garak-0.17.1-py3-none-any.whl",
+  "files": 313,
+  "chars": 3075888,
+  "dispositions": {
+   "corpus": 14
+  },
+  "manipulation_findings": [],
+  "seconds": 5.9
+ },
+ {
+  "package": "pypi:llm-guard",
+  "split": "dev",
+  "category": "llm-security",
+  "artifact": "llm_guard-0.3.10-py3-none-any.whl",
+  "files": 159,
+  "chars": 262506,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.4
+ },
+ {
+  "package": "pypi:guardrails-ai",
+  "split": "dev",
+  "category": "llm-security",
+  "artifact": "guardrails_ai-0.11.0-py3-none-any.whl",
+  "files": 181,
+  "chars": 758427,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.6
+ },
+ {
+  "package": "npm:openai",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "7.50.0",
+  "files": 1834,
+  "chars": 14218779,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 18.5
+ },
+ {
+  "package": "npm:langchain",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "1.6.1",
+  "files": 211,
+  "chars": 1308229,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 1.4
+ },
+ {
+  "package": "npm:ai",
+  "split": "dev",
+  "category": "llm",
+  "artifact": "7.0.162",
+  "files": 406,
+  "chars": 3528903,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 5.6
+ },
+ {
+  "package": "pypi:requests",
+  "split": "dev",
+  "category": "baseline",
+  "artifact": "requests-2.34.2-py3-none-any.whl",
+  "files": 21,
+  "chars": 222081,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.2
+ },
+ {
+  "package": "pypi:click",
+  "split": "dev",
+  "category": "baseline",
+  "artifact": "click-8.5.0-py3-none-any.whl",
+  "files": 19,
+  "chars": 445994,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.5
+ },
+ {
+  "package": "pypi:httpx",
+  "split": "dev",
+  "category": "baseline",
+  "artifact": "httpx-0.28.1-py3-none-any.whl",
+  "files": 26,
+  "chars": 292944,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.3
+ },
+ {
+  "package": "pypi:black",
+  "split": "dev",
+  "category": "baseline",
+  "artifact": "black-26.10.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+  "files": 48,
+  "chars": 818596,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.8
+ },
+ {
+  "package": "pypi:jinja2",
+  "split": "dev",
+  "category": "baseline",
+  "artifact": "jinja2-3.1.6-py3-none-any.whl",
+  "files": 28,
+  "chars": 493317,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.5
+ },
+ {
+  "package": "npm:express",
+  "split": "dev",
+  "category": "baseline",
+  "artifact": "5.3.0",
+  "files": 9,
+  "chars": 75386,
+  "dispositions": {},
+  "manipulation_findings": [],
+  "seconds": 0.1
+ }
+]

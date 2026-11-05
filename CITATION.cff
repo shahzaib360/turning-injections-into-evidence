@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this benchmark or code, please cite it as below."
+title: "Turning injections into evidence: hardening AI-assisted malware and package triage"
+authors:
+  - given-names: "Shahzaib"
+    alias: "shahzaib360"
+version: 0.1.0
+date-released: 2026-11-05
+license: MIT
+repository-code: "https://github.com/shahzaib360/turning-injections-into-evidence"
+keywords:
+  - prompt injection
+  - malware analysis
+  - software supply chain
+  - LLM security
+  - benchmark

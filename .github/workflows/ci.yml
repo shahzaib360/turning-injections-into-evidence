@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install radare2 (for the r2 agent test)
+        run: sudo apt-get update -q && sudo apt-get install -y -q radare2
+      - name: Install package
+        run: pip install -e ".[dev]" r2pipe
+      - name: Lint
+        run: ruff check src tests scripts
+      - name: Tests (scripted mock models; no LLM download)
+        run: pytest
+      - name: Benchmark is reproducible from the generator
+        run: |
+          tie build --out /tmp/bench
+          for f in dev test core binary gray; do cmp /tmp/bench/$f.jsonl benchmark/$f.jsonl; done
+      - name: Detector smoke test
+        run: |
+          tie detect benchmark/core.jsonl > /dev/null
